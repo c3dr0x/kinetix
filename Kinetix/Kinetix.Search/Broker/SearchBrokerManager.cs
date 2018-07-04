@@ -1,18 +1,17 @@
-﻿using System;
+﻿using Kinetix.Search.Contract;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Kinetix.Monitoring.Counter;
-using Kinetix.Monitoring.Html;
-using Kinetix.Monitoring.Manager;
-using Kinetix.Search.Contract;
-using log4net;
 
-namespace Kinetix.Search.Broker {
+namespace Kinetix.Search.Broker
+{
 
     /// <summary>
     /// Manager pour les brokers de recherche.
     /// </summary>
-    public sealed class SearchBrokerManager : IManager, IManagerDescription {
+    public sealed class SearchBrokerManager
+    {
 
         /// <summary>
         /// Constante.
@@ -27,70 +26,18 @@ namespace Kinetix.Search.Broker {
         /// <summary>
         /// Constructeur.
         /// </summary>
-        private SearchBrokerManager() {
-            Analytics.Instance.OpenDataBase(SearchCube, this);
+        private SearchBrokerManager()
+        {
         }
 
         /// <summary>
         /// Retourne une instance du manager.
         /// </summary>
-        public static SearchBrokerManager Instance {
-            get {
+        public static SearchBrokerManager Instance
+        {
+            get
+            {
                 return _instance;
-            }
-        }
-
-        /// <summary>
-        /// Nom du manager.
-        /// </summary>
-        string IManagerDescription.Name {
-            get {
-                return "Search";
-            }
-        }
-
-        /// <summary>
-        /// Retourne un objet décrivant le service.
-        /// </summary>
-        IManagerDescription IManager.Description {
-            get {
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// Image du manager.
-        /// </summary>
-        string IManagerDescription.Image {
-            get {
-                return "SEARCHDB.png";
-            }
-        }
-
-        /// <summary>
-        /// Image.
-        /// </summary>
-        byte[] IManagerDescription.ImageData {
-            get {
-                return IR.SEARCHDB_png;
-            }
-        }
-
-        /// <summary>
-        /// Priorité d'affichage du manager.
-        /// </summary>
-        int IManagerDescription.Priority {
-            get {
-                return 40;
-            }
-        }
-
-        /// <summary>
-        /// Type mime de l'image.
-        /// </summary>
-        string IManagerDescription.ImageMimeType {
-            get {
-                return "image/png";
             }
         }
 
@@ -98,8 +45,10 @@ namespace Kinetix.Search.Broker {
         /// Enregistre la source de données.
         /// </summary>
         /// <param name="dataSource">Source de données.</param>
-        public static void RegisterDefaultDataSource(string dataSource) {
-            if (string.IsNullOrEmpty(dataSource)) {
+        public static void RegisterDefaultDataSource(string dataSource)
+        {
+            if (string.IsNullOrEmpty(dataSource))
+            {
                 throw new ArgumentNullException("dataSource");
             }
 
@@ -112,24 +61,9 @@ namespace Kinetix.Search.Broker {
         /// <typeparam name="T">Type du broker.</typeparam>
         /// <returns>Le broker.</returns>
         public static ISearchBroker<T> GetBroker<T>()
-            where T : class, new() {
+            where T : class, new()
+        {
             return Instance.ReturnBroker<T>(null);
-        }
-
-        /// <summary>
-        /// Libération des ressources consommées par le manager lors du undeploy.
-        /// Exemples : connexions, thread, flux.
-        /// </summary>
-        void IManager.Close() {
-        }
-
-        /// <summary>
-        /// Extension de la méthode toString().
-        /// Permet à chaque Manager de présenter son propre état.
-        /// </summary>
-        /// <param name="writer">Writer HTML.</param>
-        void IManagerDescription.ToHtml(System.Web.UI.HtmlTextWriter writer) {
-            HtmlPageRenderer.ToHtml(SearchCube, writer);
         }
 
         /// <summary>
@@ -137,17 +71,21 @@ namespace Kinetix.Search.Broker {
         /// </summary>
         /// <param name="dataSourceName">Nom de la source de données.</param>
         /// <param name="storeType">Type du store à enregistrer.</param>
-        public void RegisterStore(string dataSourceName, Type storeType) {
-            if (dataSourceName == null) {
+        public void RegisterStore(string dataSourceName, Type storeType)
+        {
+            if (dataSourceName == null)
+            {
                 throw new ArgumentNullException("dataSourceName");
             }
 
-            if (storeType == null) {
+            if (storeType == null)
+            {
                 throw new ArgumentNullException("storeType");
             }
 
             ILog log = LogManager.GetLogger("Application");
-            if (log.IsDebugEnabled) {
+            if (log.IsDebugEnabled)
+            {
                 log.Debug("Enregistrement du search store " + dataSourceName + " du type " + storeType.FullName);
             }
 
@@ -159,7 +97,8 @@ namespace Kinetix.Search.Broker {
         /// </summary>
         /// <param name="dataSourceName">Nom de la source de données.</param>
         /// <returns>Type de store à utiliser.</returns>
-        internal Type GetStoreType(string dataSourceName) {
+        internal Type GetStoreType(string dataSourceName)
+        {
             return _storeMap[dataSourceName];
         }
 
@@ -171,10 +110,13 @@ namespace Kinetix.Search.Broker {
         /// <returns>Le broker.</returns>
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "La variable basicBroker n'est au final castée qu'une fois.")]
         private ISearchBroker<T> ReturnBroker<T>(string dataSourceName)
-            where T : class, new() {
+            where T : class, new()
+        {
             string dsName = dataSourceName;
-            if (string.IsNullOrEmpty(dsName)) {
-                if (string.IsNullOrEmpty(_defaultDataSourceName)) {
+            if (string.IsNullOrEmpty(dsName))
+            {
+                if (string.IsNullOrEmpty(_defaultDataSourceName))
+                {
                     throw new NotSupportedException("dataSource not registered, call first method RegisterDefaultDataSource");
                 }
 
@@ -183,12 +125,15 @@ namespace Kinetix.Search.Broker {
 
             string key = typeof(T).AssemblyQualifiedName + "/" + dsName;
             ISearchBroker broker;
-            if (_brokerMap.TryGetValue(key, out broker)) {
+            if (_brokerMap.TryGetValue(key, out broker))
+            {
                 return (ISearchBroker<T>)broker;
             }
 
-            lock (_brokerMap) {
-                if (_brokerMap.TryGetValue(key, out broker)) {
+            lock (_brokerMap)
+            {
+                if (_brokerMap.TryGetValue(key, out broker))
+                {
                     return (ISearchBroker<T>)broker;
                 }
 
