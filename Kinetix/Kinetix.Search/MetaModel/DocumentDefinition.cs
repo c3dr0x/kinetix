@@ -23,6 +23,7 @@ namespace Kinetix.Search.MetaModel
             this.BeanType = beanType;
             this.Fields = properties;
             this.DocumentTypeName = documentTypeName;
+
             foreach (DocumentFieldDescriptor property in properties)
             {
                 switch (property.DocumentCategory)

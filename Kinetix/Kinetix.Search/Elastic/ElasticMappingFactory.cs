@@ -1,7 +1,7 @@
-﻿using Kinetix.Search.ComponentModel;
+﻿using System;
+using Kinetix.Search.ComponentModel;
 using Kinetix.Search.MetaModel;
 using Nest;
-using System;
 
 namespace Kinetix.Search.Elastic
 {
@@ -61,6 +61,7 @@ namespace Kinetix.Search.Elastic
                         .Store(true));
 
                 case SearchFieldCategory.TextSearch:
+                case SearchFieldCategory.Terms:
                     /* Champ de recherche textuelle full-text. */
                     return selector.Text(x => x
                         .Name(fieldName)
@@ -88,13 +89,6 @@ namespace Kinetix.Search.Elastic
                         .Index(true)
                         .Store(false));
 
-                case SearchFieldCategory.ListTerm:
-                    return selector.Text(x => x
-                        .Name(fieldName)
-                        .Index(true)
-                        .Store(false)
-                        .Analyzer("text_fr"));
-
                 case SearchFieldCategory.Sort:
                     if (field.PropertyType == typeof(DateTime?))
                     {
@@ -116,13 +110,9 @@ namespace Kinetix.Search.Elastic
                         .Name(fieldName)
                         .Index(true)
                         .Store(false));
-
-                case SearchFieldCategory.None:
-                    return selector;
-
-                default:
-                    throw new NotSupportedException("Category not supported : " + field.SearchCategory);
             }
+
+            return selector;
         }
     }
 }

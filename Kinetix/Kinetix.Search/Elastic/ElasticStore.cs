@@ -479,11 +479,11 @@ namespace Kinetix.Search.Elastic
                 switch (field.SearchCategory)
                 {
                     case SearchFieldCategory.Term:
-                    case SearchFieldCategory.ListTerm:
+                    case SearchFieldCategory.Terms:
                         filterList.Add(_builder.BuildFilter(field.FieldName, entry.Value));
                         break;
                     case SearchFieldCategory.TextSearch:
-                        _builder.BuildFullTextSearch(field.FieldName, entry.Value);
+                        filterList.Add(_builder.BuildFullTextSearch(field.FieldName, entry.Value));
                         break;
                     default:
                         throw new ElasticException($"Cannot filter on fields that are not Term, ListTerm or TextSearch, field in error: {field.FieldName}");

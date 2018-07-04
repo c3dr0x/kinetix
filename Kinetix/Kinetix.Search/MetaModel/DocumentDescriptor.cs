@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Kinetix.Search.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Kinetix.Search.ComponentModel;
 
-namespace Kinetix.Search.MetaModel {
+namespace Kinetix.Search.MetaModel
+{
 
     /// <summary>
     /// Fournit la description d'un document.
     /// </summary>
-    public sealed class DocumentDescriptor {
+    public sealed class DocumentDescriptor
+    {
 
         private static DocumentDescriptor _instance;
 
@@ -17,14 +19,16 @@ namespace Kinetix.Search.MetaModel {
         /// <summary>
         /// Crée un nouvelle instance.
         /// </summary>
-        private DocumentDescriptor() {
+        private DocumentDescriptor()
+        {
             _beanDefinitionDictionnary = new Dictionary<Type, DocumentDefinition>();
         }
 
         /// <summary>
         /// Retourne une instance unique.
         /// </summary>
-        private static DocumentDescriptor Instance {
+        private static DocumentDescriptor Instance
+        {
             get { return _instance ?? (_instance = new DocumentDescriptor()); }
         }
 
@@ -33,8 +37,10 @@ namespace Kinetix.Search.MetaModel {
         /// </summary>
         /// <param name="beanType">Type du bean.</param>
         /// <returns>Description des propriétés.</returns>
-        public static DocumentDefinition GetDefinition(Type beanType) {
-            if (beanType == null) {
+        public static DocumentDefinition GetDefinition(Type beanType)
+        {
+            if (beanType == null)
+            {
                 throw new ArgumentNullException("beanType");
             }
 
@@ -46,20 +52,15 @@ namespace Kinetix.Search.MetaModel {
         /// </summary>
         /// <param name="beanType">Type du bean.</param>
         /// <returns>Collection.</returns>
-        private static DocumentFieldDescriptorCollection CreateCollection(Type beanType) {
+        private static DocumentFieldDescriptorCollection CreateCollection(Type beanType)
+        {
             DocumentFieldDescriptorCollection coll = new DocumentFieldDescriptorCollection(beanType);
             PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(beanType);
 
-            foreach (PropertyDescriptor property in properties) {
-
+            foreach (PropertyDescriptor property in properties)
+            {
                 SearchFieldAttribute fieldAttr = (SearchFieldAttribute)property.Attributes[typeof(SearchFieldAttribute)];
-                if (fieldAttr == null) {
-                    throw new NotSupportedException("Missing SearchFieldAttribute on property " + beanType + "." + property.Name);
-                }
-
                 DocumentFieldAttribute docAttr = (DocumentFieldAttribute)property.Attributes[typeof(DocumentFieldAttribute)];
-
-                var fieldCategory = fieldAttr.Category;
 
                 string fieldName = ToCamelCase(property.Name);
                 DocumentFieldDescriptor description = new DocumentFieldDescriptor(
@@ -67,7 +68,7 @@ namespace Kinetix.Search.MetaModel {
                             fieldName,
                             property.PropertyType,
                             docAttr?.Category,
-                            fieldCategory);
+                            fieldAttr?.Category);
 
                 coll[description.PropertyName] = description;
             }
@@ -80,8 +81,10 @@ namespace Kinetix.Search.MetaModel {
         /// </summary>
         /// <param name="raw">Chaîne source.</param>
         /// <returns>Chaîne en camelCase.</returns>
-        private static string ToCamelCase(string raw) {
-            if (string.IsNullOrEmpty(raw)) {
+        private static string ToCamelCase(string raw)
+        {
+            if (string.IsNullOrEmpty(raw))
+            {
                 return raw;
             }
 
@@ -93,11 +96,14 @@ namespace Kinetix.Search.MetaModel {
         /// </summary>
         /// <param name="beanType">Type du bean.</param>
         /// <returns>Description des propriétés.</returns>
-        private DocumentDefinition GetDefinitionInternal(Type beanType) {
+        private DocumentDefinition GetDefinitionInternal(Type beanType)
+        {
             DocumentDefinition definition;
-            if (!_beanDefinitionDictionnary.TryGetValue(beanType, out definition)) {
+            if (!_beanDefinitionDictionnary.TryGetValue(beanType, out definition))
+            {
                 SearchDocumentTypeAttribute documentType = (SearchDocumentTypeAttribute)TypeDescriptor.GetAttributes(beanType)[typeof(SearchDocumentTypeAttribute)];
-                if (documentType == null) {
+                if (documentType == null)
+                {
                     throw new NotSupportedException("Missing SearchDocumentTypeAttribute on type " + beanType);
                 }
 

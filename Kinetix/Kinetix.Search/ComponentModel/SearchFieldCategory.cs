@@ -6,7 +6,6 @@
     /// </summary>
     public enum SearchFieldCategory
     {
-
         /// <summary>
         /// Champ de résultat, destiné à l'affichage : non indexé, stocké.
         /// </summary>
@@ -30,11 +29,6 @@
         /// <summary>
         /// Champ de Facette ou Fitlre contenant une liste de valeurs : indexé tel quel, non stocké.
         /// </summary>
-        ListTerm,
-
-        /// <summary>
-        /// Champ laissé par défaut.
-        /// </summary>
-        None,
+        Terms,
     }
 }
